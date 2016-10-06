@@ -1,9 +1,15 @@
 import openpyxl
-import time
 import os
 import sys
 
+
 def scrub(quote_file):
+
+    # check for file
+    if not os.path.isfile(quote_file):
+        print("Could not find quote file " + quote_file, file=sys.stderr)
+        return
+
     # read quote from quote.xlsx
     wb = openpyxl.load_workbook(quote_file, read_only=True)
     sheet = wb.active
@@ -50,7 +56,6 @@ def scrub(quote_file):
 
         if ',' in row["Serial #"]:
             # multiple serial numbers in this row, need to split
-            serials = []
             serials = row["Serial #"].split(',')
 
             for serial in serials:
@@ -76,4 +81,5 @@ def scrub(quote_file):
     wb.save(save_file_name)
     print("Done, created " + save_file_name, file=sys.stderr)
 if __name__ == "__main__":
+    print("Attempting to scrub quote.xlsx", file=sys.stderr)
     scrub("quote.xlsx")
