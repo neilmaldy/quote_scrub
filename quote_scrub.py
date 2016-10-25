@@ -51,7 +51,7 @@ def scrub(quote_file):
 
     # keep running total of Net Price
     net_price_total = 0
-
+    net_price_by_serial = {}
     for row in quote:
 
         if ',' in row["Serial #"]:
@@ -68,14 +68,28 @@ def scrub(quote_file):
                 new_row["Ext Net Price"] = row["Net Price"]
                 ws.append([new_row[column] for column in header_row])
                 net_price_total += row["Net Price"]
+                if serial.strip() not in net_price_by_serial:
+                    net_price_by_serial[serial.strip()] = 0
+                net_price_by_serial[serial.strip()] += row["Net Price"]
         else:
             # single serial number in this row
             ws.append([row[column] for column in header_row])
             net_price_total += row["Net Price"]
+            serial = row["Serial #"].strip()
+            if serial not in net_price_by_serial:
+                net_price_by_serial[serial] = 0
+            net_price_by_serial[serial] += row["Net Price"]
 
     # insert total net price
+    ws.append([])
     ws.append(["Total Net Price:"])
     ws.append([net_price_total])
+
+    ws = wb.create_sheet()
+    ws.append(["Serial #", "Net Price"])
+    for serial in net_price_by_serial:
+        print(serial + " total net price: " + str(net_price_by_serial[serial]))
+        ws.append([serial, net_price_by_serial[serial]])
 
     save_file_name = quote_file.replace('.xlsx', '_scrubed.xlsx')
     wb.save(save_file_name)
