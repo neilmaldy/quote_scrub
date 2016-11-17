@@ -101,5 +101,5 @@ class QuoteScrubGui(tkinter.Tk):
 
 if __name__ == "__main__":
     app = QuoteScrubGui(None)
-    app.title('Quote Scrub v1.0.1')
+    app.title('Quote Scrub v1.0.3')
     app.mainloop()

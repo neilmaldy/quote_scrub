@@ -67,10 +67,16 @@ def scrub(quote_file):
                 new_row["Ext List Price"] = row["List Price"]
                 new_row["Ext Net Price"] = row["Net Price"]
                 ws.append([new_row[column] for column in header_row])
-                net_price_total += row["Net Price"]
+                try:
+                    net_price_total += row["Net Price"]
+                except TypeError:
+                    pass
                 if serial.strip() not in net_price_by_serial:
                     net_price_by_serial[serial.strip()] = 0
-                net_price_by_serial[serial.strip()] += row["Net Price"]
+                try:
+                    net_price_by_serial[serial.strip()] += row["Net Price"]
+                except TypeError:
+                    pass
         else:
             # single serial number in this row
             ws.append([row[column] for column in header_row])
@@ -78,7 +84,10 @@ def scrub(quote_file):
             serial = row["Serial #"].strip()
             if serial not in net_price_by_serial:
                 net_price_by_serial[serial] = 0
-            net_price_by_serial[serial] += row["Net Price"]
+            try:
+                net_price_by_serial[serial] += row["Net Price"]
+            except TypeError:
+                pass
 
     # insert total net price
     ws.append([])
@@ -92,6 +101,7 @@ def scrub(quote_file):
         ws.append([serial, net_price_by_serial[serial]])
 
     save_file_name = quote_file.replace('.xlsx', '_scrubed.xlsx')
+    save_file_name = save_file_name.replace('.XLSX', '_scrubed.xlsx')
     wb.save(save_file_name)
     print("Done, created " + save_file_name, file=sys.stderr)
 if __name__ == "__main__":
