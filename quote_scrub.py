@@ -30,7 +30,8 @@ def scrub(quote_file):
             if key == "Serial #":
                 # save serial #'s as strings, strip off spaces
                 record[key] = str(cell.value).strip()
-
+                print(record[key].count(',')+1)
+                print(record[key])
             elif cell.data_type == 's':
                 # strip extra spaces from strings
                 record[key] = cell.value.strip()
@@ -45,6 +46,8 @@ def scrub(quote_file):
     # prepare to write quote_scrubed.xlsx
     wb = openpyxl.Workbook(write_only=True)
     ws = wb.create_sheet()
+    serial_column = header_row.index('Serial #')
+    header_row.insert(serial_column + 1,'S/N count')
 
     # add column headings
     ws.append(header_row)
@@ -53,6 +56,7 @@ def scrub(quote_file):
     net_price_total = 0
     net_price_by_serial = {}
     for row in quote:
+        row['S/N count'] = row["Serial #"].count(',') + 1
 
         if ',' in row["Serial #"]:
             # multiple serial numbers in this row, need to split
@@ -63,6 +67,7 @@ def scrub(quote_file):
                 new_row = dict(row)
                 new_row["Serial #"] = serial.strip()
                 new_row["Qty"] = 1
+
                 new_row["Ext Qty"] = 1
                 new_row["Ext List Price"] = row["List Price"]
                 new_row["Ext Net Price"] = row["Net Price"]
